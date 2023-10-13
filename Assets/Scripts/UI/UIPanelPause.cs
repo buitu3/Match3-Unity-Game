@@ -39,4 +39,9 @@ public class UIPanelPause : MonoBehaviour, IMenu
     {
         this.gameObject.SetActive(false);
     }
+
+    public void OnBtnRestartClickedHandler()
+    {
+        m_mngr.OnRestartHandler();
+    }
 }

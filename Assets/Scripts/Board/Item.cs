@@ -15,6 +15,7 @@ public class Item
     public virtual void SetView()
     {
         string prefabname = GetPrefabName();
+        Sprite prefabNewSprite = GetPRefabSprite();
 
         if (!string.IsNullOrEmpty(prefabname))
         {
@@ -22,11 +23,19 @@ public class Item
             if (prefab)
             {
                 View = GameObject.Instantiate(prefab).transform;
+
+                var viewSprite = View.GetComponent<SpriteRenderer>();
+                if (viewSprite != null && prefabNewSprite != null) viewSprite.sprite = prefabNewSprite;
             }
         }
     }
 
     protected virtual string GetPrefabName() { return string.Empty; }
+
+    protected virtual Sprite GetPRefabSprite()
+    {
+        return null;
+    }
 
     public virtual void SetCell(Cell cell)
     {

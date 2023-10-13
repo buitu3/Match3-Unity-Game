@@ -30,4 +30,25 @@ public class MainToolMenu
         Selection.activeObject = asset;
     }
 
+    [MenuItem(menuTitle + "!! Create Cell Settings !!", false, 540)]
+    static void CreateCellSetting()
+    {
+        CellSettings asset = ScriptableObject.CreateInstance<CellSettings>();
+
+        AssetDatabase.CreateAsset(asset, "Assets/Resources/cellsettings.asset");
+        AssetDatabase.SaveAssets();
+
+        EditorUtility.FocusProjectWindow();
+
+        Selection.activeObject = asset;
+    }
+
+    [MenuItem(menuTitle + "Open Cell Settings", false, 420)]
+    static void OpenCellData()
+    {
+        CellSettings asset = Resources.Load<CellSettings>("cellsettings");
+
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = asset;
+    }
 }

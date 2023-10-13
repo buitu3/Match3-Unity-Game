@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour
         MOVES
     }
 
+    private eLevelMode m_mode;
+
     public enum eStateGame
     {
         SETUP,
@@ -37,7 +39,7 @@ public class GameManager : MonoBehaviour
 
 
     private GameSettings m_gameSettings;
-
+    public static CellSettings m_cellSettings;
 
     private BoardController m_boardController;
 
@@ -50,6 +52,7 @@ public class GameManager : MonoBehaviour
         State = eStateGame.SETUP;
 
         m_gameSettings = Resources.Load<GameSettings>(Constants.GAME_SETTINGS_PATH);
+        m_cellSettings = Resources.Load<CellSettings>(Constants.CELL_SETTINGS_PATH);
 
         m_uiMenu = FindObjectOfType<UIMainManager>();
         m_uiMenu.Setup(this);
@@ -83,6 +86,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadLevel(eLevelMode mode)
     {
+        m_mode = mode;
         m_boardController = new GameObject("BoardController").AddComponent<BoardController>();
         m_boardController.StartGame(this, m_gameSettings);
 
@@ -114,6 +118,24 @@ public class GameManager : MonoBehaviour
             m_boardController.Clear();
             Destroy(m_boardController.gameObject);
             m_boardController = null;
+        }
+    }
+
+    internal void RestartLevel()
+    {
+        ClearLevel();
+        switch (m_mode)
+        {
+            case eLevelMode.MOVES:
+                {
+                    LoadLevel(eLevelMode.MOVES);
+                    break;
+                }
+            case eLevelMode.TIMER:
+                {
+                    LoadLevel(eLevelMode.TIMER);
+                    break;
+                }
         }
     }
 

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using System.Linq;
 
 public class Board
 {
@@ -147,7 +148,21 @@ public class Board
 
                 NormalItem item = new NormalItem();
 
-                item.SetType(Utils.GetRandomNormalType());
+                // Old code
+                //item.SetType(Utils.GetRandomNormalType());
+
+                var neighborTypes = GetNeighborCellsType(cell);
+                var normalItemLst = GetBoardCellsTypeDesc();
+                for(int i = normalItemLst.Count - 1; i > 0; i--)
+                {
+                    if (neighborTypes.Contains(normalItemLst[i].Type))
+                    {
+                        continue;
+                    }
+
+                    item.SetType(normalItemLst[i].Type);
+                }
+
                 item.SetView();
                 item.SetViewRoot(m_root);
 
@@ -155,6 +170,74 @@ public class Board
                 cell.ApplyItemPosition(true);
             }
         }
+    }
+
+    internal List<NormalItem.eNormalType> GetNeighborCellsType(Cell cell)
+    {
+        var result = new List<NormalItem.eNormalType>();
+        if(cell.NeighbourUp != null && cell.NeighbourUp.Item is NormalItem)
+        {
+            var neighborItem = cell.NeighbourUp.Item as NormalItem;
+            result.Add(neighborItem.ItemType);
+        }
+
+        if (cell.NeighbourBottom != null && cell.NeighbourBottom.Item is NormalItem)
+        {
+            var neighborItem = cell.NeighbourBottom.Item as NormalItem;
+            result.Add(neighborItem.ItemType);
+        }
+
+        if (cell.NeighbourRight != null && cell.NeighbourRight.Item is NormalItem)
+        {
+            var neighborItem = cell.NeighbourRight.Item as NormalItem;
+            result.Add(neighborItem.ItemType);
+        }
+
+        if (cell.NeighbourLeft != null && cell.NeighbourLeft.Item is NormalItem)
+        {
+            var neighborItem = cell.NeighbourLeft.Item as NormalItem;
+            result.Add(neighborItem.ItemType);
+        }
+
+        return result;
+    }
+
+    internal List<NormalItemTypeStatistic> GetBoardCellsTypeDesc()
+    {
+        Dictionary<NormalItem.eNormalType, int> tempTypeDict = new Dictionary<NormalItem.eNormalType, int>();
+        tempTypeDict.Add(NormalItem.eNormalType.TYPE_ONE, 0);
+        tempTypeDict.Add(NormalItem.eNormalType.TYPE_TWO, 0);
+        tempTypeDict.Add(NormalItem.eNormalType.TYPE_THREE, 0);
+        tempTypeDict.Add(NormalItem.eNormalType.TYPE_FOUR, 0);
+        tempTypeDict.Add(NormalItem.eNormalType.TYPE_FIVE, 0);
+        tempTypeDict.Add(NormalItem.eNormalType.TYPE_SIX, 0);
+        tempTypeDict.Add(NormalItem.eNormalType.TYPE_SEVEN, 0);
+
+        // Count the number of normal item for each type
+        for (int x = 0; x < boardSizeX; x++)
+        {
+            for (int y = 0; y < boardSizeY; y++)
+            {
+                var currentCell = m_cells[x, y];
+                if (currentCell.Item is NormalItem)
+                {
+                    var normalItem = currentCell.Item as NormalItem;
+                    tempTypeDict[normalItem.ItemType] += 1;
+                }
+            }
+        }
+
+        var itemTypeLst = new List<NormalItemTypeStatistic>();
+        foreach (KeyValuePair<NormalItem.eNormalType, int> entry in tempTypeDict)
+        {
+            itemTypeLst.Add(new NormalItemTypeStatistic
+            {
+                Type = entry.Key,
+                Count = entry.Value
+            });
+        }
+
+        return itemTypeLst.OrderByDescending(t => t.Count).ToList();
     }
 
     internal void ExplodeAllItems()
@@ -674,4 +757,9 @@ public class Board
             }
         }
     }
+}
+
+public class NormalItemTypeStatistic{
+    public NormalItem.eNormalType Type;
+    public int Count;
 }
